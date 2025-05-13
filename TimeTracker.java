@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TimeTracker extends JFrame implements ActionListener {
-    // UI-Komponenten
+    // UI components
     private JButton startButton, pauseButton, stopButton, adjustButton, addDayButton, deleteDayButton;
     private JLabel sessionLabel;
     private JLabel totalLabel;
@@ -18,36 +18,36 @@ public class TimeTracker extends JFrame implements ActionListener {
     private DefaultTableModel tableModel;
     private Timer timer;
 
-    // Layout Panels und ScrollPane
+    // Layout panels and scroll pane
     private JPanel topPanel;
     private JPanel labelPanel;
     private JScrollPane scrollPane;
 
-    // Variablen zur Zeiterfassung
+    // Time tracking variables
     private boolean isRunning = false;
     private boolean isPaused = false;
     private long sessionStartTime = 0;
     private long sessionElapsedTime = 0;
 
-    // Map für täglich investierte Zeiten (Datum -> Zeit in Millisekunden)
+    // Map for daily tracked time (date -> milliseconds)
     private Map<LocalDate, Long> dailyTimes = new HashMap<>();
 
-    // Steuerung der Zeitanzeige in der Tabelle (Standard: nur hh:mm)
+    // Controls whether seconds should be shown in the table (default: only hh:mm)
     private boolean showSecondsInTable = false;
-    // Formatter für Datum im Format "dd.MM.yyyy"
+    // Formatter for displaying the date in "dd.MM.yyyy" format
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    // Dateipfad, in dem die Daten gespeichert werden
+    // File path where data will be saved
     private final String DATA_FILE = "timetracker_data.txt";
 
     public TimeTracker() {
-        super("Time Tracker - Programmieren");
+        super("Time Tracker - Programming");
         initComponents();
         loadData();
         updateTable();
         updateTotalLabel();
 
-        // Daten speichern beim Schließen des Fensters
+        // Save data when the window is closing
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -57,14 +57,14 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Initialisiert alle GUI-Komponenten, fügt die Buttons hinzu und startet den Timer.
+     * Initializes all GUI components, adds the buttons, and starts the timer.
      */
     private void initComponents() {
-        // --- Menüleiste (Dark Mode, nur Toggle für Zeitanzeige mit Sekunden) ---
+        // --- Menu bar (Dark Mode, toggle to show seconds) ---
         JMenuBar menuBar = new JMenuBar();
-        JMenu viewMenu = new JMenu("Ansicht");
-        // Toggle zur Auswahl, ob in der Tabelle auch Sekunden angezeigt werden sollen
-        JCheckBoxMenuItem secondsToggle = new JCheckBoxMenuItem("Zeitanzeige mit Sekunden");
+        JMenu viewMenu = new JMenu("View");
+        // Toggle to enable showing seconds in the time display
+        JCheckBoxMenuItem secondsToggle = new JCheckBoxMenuItem("Show seconds in time display");
         secondsToggle.addActionListener(e -> {
             showSecondsInTable = secondsToggle.isSelected();
             updateTableHeader();
@@ -74,15 +74,15 @@ public class TimeTracker extends JFrame implements ActionListener {
         menuBar.add(viewMenu);
         setJMenuBar(menuBar);
 
-        // --- Buttons erstellen ---
+        // --- Create buttons ---
         startButton = new JButton("Start");
         pauseButton = new JButton("Pause");
         stopButton = new JButton("Stop");
-        adjustButton = new JButton("Zeit anpassen");
-        addDayButton = new JButton("Zeit hinzufügen");
-        deleteDayButton = new JButton("Tag löschen");
+        adjustButton = new JButton("Adjust time");
+        addDayButton = new JButton("Add time");
+        deleteDayButton = new JButton("Delete day");
 
-        // --- Button-Styling (Dark Mode) ---
+        // --- Button styling (Dark Mode) ---
         Color primaryButtonColor = new Color(70, 130, 180);
         Color stopButtonColor = new Color(180, 70, 70);
         Color deleteButtonColor = new Color(200, 50, 50);
@@ -100,7 +100,7 @@ public class TimeTracker extends JFrame implements ActionListener {
         deleteDayButton.setBackground(deleteButtonColor);
         deleteDayButton.setForeground(Color.WHITE);
 
-        // Fokus-Hervorhebungen deaktivieren
+        // Disable focus highlights
         startButton.setFocusPainted(false);
         pauseButton.setFocusPainted(false);
         stopButton.setFocusPainted(false);
@@ -108,7 +108,7 @@ public class TimeTracker extends JFrame implements ActionListener {
         addDayButton.setFocusPainted(false);
         deleteDayButton.setFocusPainted(false);
 
-        // ActionListener anhängen
+        // Attach ActionListeners
         startButton.addActionListener(this);
         pauseButton.addActionListener(this);
         stopButton.addActionListener(this);
@@ -116,24 +116,23 @@ public class TimeTracker extends JFrame implements ActionListener {
         addDayButton.addActionListener(this);
         deleteDayButton.addActionListener(this);
 
-        // --- Labels für die Zeitanzeige ---
-        sessionLabel = new JLabel("Aktuelle Sitzung: 00:00:00");
-        totalLabel = new JLabel("Gesamte Zeit: 00:00:00");
+        // --- Labels to show time ---
+        sessionLabel = new JLabel("Current session: 00:00:00");
+        totalLabel = new JLabel("Total time: 00:00:00");
         sessionLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         totalLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
 
-        // --- Tabelle zur Darstellung der täglich investierten Zeiten ---
-        tableModel = new DefaultTableModel(new Object[]{"Datum", "Investierte Zeit"}, 0);
+        // --- Table to show daily tracked time ---
+        tableModel = new DefaultTableModel(new Object[]{"Date", "Tracked time"}, 0);
         table = new JTable(tableModel);
-        // Erlaubt manuelles Anpassen der Spaltenbreiten
+        // Allow manual column resizing
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // --- Panels (Layout) ---
+        // --- Layout panels ---
         topPanel = new JPanel();
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        // Buttons im oberen Panel hinzufügen
         topPanel.add(startButton);
         topPanel.add(pauseButton);
         topPanel.add(stopButton);
@@ -146,69 +145,69 @@ public class TimeTracker extends JFrame implements ActionListener {
         labelPanel.add(sessionLabel);
         labelPanel.add(totalLabel);
 
-        // Oberen Bereich (Buttons & Labels) in einem Panel zusammenfassen
+        // Combine buttons & labels into upper panel
         JPanel upperPanel = new JPanel(new BorderLayout());
         upperPanel.add(topPanel, BorderLayout.NORTH);
         upperPanel.add(labelPanel, BorderLayout.CENTER);
 
-        // --- JSplitPane einfügen, um obere und untere Bereiche flexibel anzupassen ---
+        // --- JSplitPane to separate top and bottom areas ---
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upperPanel, scrollPane);
-        splitPane.setResizeWeight(0.3); // Obere 30 % und untere 70 % als Startverhältnis
+        splitPane.setResizeWeight(0.3); // 30% top, 70% bottom
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(splitPane, BorderLayout.CENTER);
 
-        // --- Timer, der jede Sekunde die aktuelle Sitzung aktualisiert ---
+        // Timer updates the current session every second
         timer = new Timer(1000, e -> updateSessionTime());
 
-        // --- Dark Mode anwenden (kompletter Stil) ---
+        // Apply dark theme to all components
         applyDarkTheme();
 
-        // --- Fenster-Einstellungen ---
+        // Window settings
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 500);
-        setLocationRelativeTo(null); // Zentriert das Fenster
+        setLocationRelativeTo(null); // Center the window
         setResizable(true);
         setVisible(true);
     }
 
     /**
-     * Wendet ein vollständiges Dark Mode Theme auf alle Komponenten an.
+     * Applies a full dark mode theme to all components.
      */
     private void applyDarkTheme() {
-        // Hintergrundfarben
+        // Background colors
         getContentPane().setBackground(new Color(35, 35, 35));
         topPanel.setBackground(new Color(35, 35, 35));
         labelPanel.setBackground(new Color(55, 55, 55));
 
-        // Labels in Weiß
+        // Labels in white
         sessionLabel.setForeground(Color.WHITE);
         totalLabel.setForeground(Color.WHITE);
 
-        // Tabelle: Hintergrund und Scrollbereich
+        // Table background and viewport
         table.setBackground(new Color(60, 60, 60));
         table.setForeground(Color.WHITE);
         scrollPane.getViewport().setBackground(new Color(60, 60, 60));
 
-        // Table Header: Heller Hintergrund, schwarze Schrift für guten Kontrast
+        // Table header: lighter background, black text for contrast
         table.getTableHeader().setBackground(new Color(120, 120, 120));
         table.getTableHeader().setForeground(Color.BLACK);
     }
 
     /**
-     * Aktualisiert die Anzeige der aktuellen Sitzung.
+     * Updates the display of the current session.
      */
     private void updateSessionTime() {
         if (isRunning) {
             long currentTime = System.currentTimeMillis();
             long currentSessionTime = sessionElapsedTime + (currentTime - sessionStartTime);
-            sessionLabel.setText("Aktuelle Sitzung: " + formatTime(currentSessionTime));
+            sessionLabel.setText("Current session: " + formatTime(currentSessionTime));
         }
     }
 
     /**
-     * Formatiert die übergebene Zeit (Millisekunden) in das Format hh:mm:ss.
-     * (Wird für die Anzeige der aktuellen Sitzung genutzt.)
+     * Formats the given time (in milliseconds) into hh:mm:ss.
+     * (Used for the current session display.)
      */
     private String formatTime(long millis) {
         long seconds = millis / 1000;
@@ -219,9 +218,8 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Formatiert die Zeit für die Anzeige in der Tabelle.
-     * Je nach Einstellung (showSecondsInTable) werden entweder nur Stunden und Minuten
-     * oder auch Sekunden angezeigt.
+     * Formats time for the table display.
+     * Depending on the setting (showSecondsInTable), shows hh:mm or hh:mm:ss.
      */
     private String formatTimeTable(long millis) {
         long seconds = millis / 1000;
@@ -236,17 +234,16 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Aktualisiert den Table Header, sodass in der Zeit-Spalte angezeigt wird,
-     * ob Sekunden mit angezeigt werden.
+     * Updates the table header to indicate whether seconds are shown.
      */
     private void updateTableHeader() {
-        String headerTime = showSecondsInTable ? "Investierte Zeit (hh:mm:ss)" : "Investierte Zeit (hh:mm)";
+        String headerTime = showSecondsInTable ? "Tracked time (hh:mm:ss)" : "Tracked time (hh:mm)";
         table.getColumnModel().getColumn(1).setHeaderValue(headerTime);
         table.getTableHeader().repaint();
     }
 
     /**
-     * Behandelt alle Button-Events.
+     * Handles button click events.
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -266,7 +263,7 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Startet bzw. setzt eine pausierte Sitzung fort.
+     * Starts or resumes a paused session.
      */
     private void handleStart() {
         if (!isRunning) {
@@ -278,7 +275,7 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Pausiert die laufende Sitzung und speichert die bisher verstrichene Zeit.
+     * Pauses the running session and saves elapsed time.
      */
     private void handlePause() {
         if (isRunning) {
@@ -287,13 +284,13 @@ public class TimeTracker extends JFrame implements ActionListener {
             isRunning = false;
             isPaused = true;
             timer.stop();
-            sessionLabel.setText("Aktuelle Sitzung: " + formatTime(sessionElapsedTime));
+            sessionLabel.setText("Current session: " + formatTime(sessionElapsedTime));
         }
     }
 
     /**
-     * Beendet die aktuelle Sitzung, speichert die Zeit für das heutige Datum
-     * und aktualisiert die Übersicht.
+     * Stops the current session, saves the time for today,
+     * and updates the overview.
      */
     private void handleStop() {
         long totalSessionTime = sessionElapsedTime;
@@ -306,28 +303,27 @@ public class TimeTracker extends JFrame implements ActionListener {
         isPaused = false;
         sessionElapsedTime = 0;
         timer.stop();
-        sessionLabel.setText("Aktuelle Sitzung: 00:00:00");
+        sessionLabel.setText("Current session: 00:00:00");
 
         updateTable();
         updateTotalLabel();
     }
 
     /**
-     * Ermöglicht das manuelle Anpassen der investierten Zeit eines ausgewählten Tages.
+     * Allows manual adjustment of the tracked time for a selected day.
      */
     private void handleTimeAdjustment() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Bitte wählen Sie einen Tag aus der Tabelle aus, um die Zeit anzupassen.",
-                    "Keine Auswahl", JOptionPane.WARNING_MESSAGE);
+                    "Please select a day from the table to adjust the time.",
+                    "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
         String dateStr = tableModel.getValueAt(selectedRow, 0).toString();
-        // Datum aus dem String im Format "dd.MM.yyyy" parsen:
         LocalDate date = LocalDate.parse(dateStr, dateFormatter);
         String newTimeStr = JOptionPane.showInputDialog(this,
-                "Neuer Zeitwert für " + dateStr + " (Format HH:mm:ss):",
+                "New time value for " + dateStr + " (format HH:mm:ss):",
                 tableModel.getValueAt(selectedRow, 1).toString());
         if (newTimeStr == null || newTimeStr.trim().isEmpty()) {
             return;
@@ -335,8 +331,8 @@ public class TimeTracker extends JFrame implements ActionListener {
         String[] parts = newTimeStr.split(":");
         if (parts.length != 3) {
             JOptionPane.showMessageDialog(this,
-                    "Ungültiges Format. Bitte verwenden Sie HH:mm:ss.",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
+                    "Invalid format. Please use HH:mm:ss.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         try {
@@ -349,19 +345,19 @@ public class TimeTracker extends JFrame implements ActionListener {
             updateTotalLabel();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
-                    "Fehler beim Parsen des Zeitwerts. Bitte stellen Sie sicher, dass Sie gültige Zahlen eingeben.",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
+                    "Error parsing time. Please ensure valid numbers.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * Ermöglicht das Hinzufügen einer Zeit für ein beliebiges Datum.
-     * Falls bereits eine Zeit für das Datum existiert, wird die neue Zeit addiert.
+     * Allows adding time for any date.
+     * If the date already exists, the new time is added.
      */
     private void handleAddDay() {
         String dateInput = JOptionPane.showInputDialog(this,
-                "Datum eingeben (Format dd.MM.yyyy):",
-                "Datum hinzufügen", JOptionPane.QUESTION_MESSAGE);
+                "Enter date (format dd.MM.yyyy):",
+                "Add date", JOptionPane.QUESTION_MESSAGE);
         if (dateInput == null || dateInput.trim().isEmpty()) {
             return;
         }
@@ -370,12 +366,12 @@ public class TimeTracker extends JFrame implements ActionListener {
             date = LocalDate.parse(dateInput, dateFormatter);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
-                    "Ungültiges Datum. Bitte verwenden Sie das Format dd.MM.yyyy.",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
+                    "Invalid date. Please use format dd.MM.yyyy.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         String timeInput = JOptionPane.showInputDialog(this,
-                "Zeit hinzufügen (Format HH:mm:ss):",
+                "Add time (format HH:mm:ss):",
                 "00:00:00");
         if (timeInput == null || timeInput.trim().isEmpty()) {
             return;
@@ -383,8 +379,8 @@ public class TimeTracker extends JFrame implements ActionListener {
         String[] parts = timeInput.split(":");
         if (parts.length != 3) {
             JOptionPane.showMessageDialog(this,
-                    "Ungültiges Zeitformat. Bitte verwenden Sie HH:mm:ss.",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
+                    "Invalid time format. Please use HH:mm:ss.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         try {
@@ -398,27 +394,27 @@ public class TimeTracker extends JFrame implements ActionListener {
             updateTotalLabel();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
-                    "Zeit konnte nicht gelesen werden. Bitte geben Sie gültige Zahlen ein.",
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
+                    "Could not read time. Please enter valid numbers.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * Löscht den in der Tabelle ausgewählten Tag.
+     * Deletes the selected day from the table.
      */
     private void handleDeleteDay() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Bitte wählen Sie einen Tag aus der Tabelle, den Sie löschen möchten.",
-                    "Keine Auswahl", JOptionPane.WARNING_MESSAGE);
+                    "Please select a day in the table you want to delete.",
+                    "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
         String dateStr = tableModel.getValueAt(selectedRow, 0).toString();
         LocalDate date = LocalDate.parse(dateStr, dateFormatter);
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Soll der Tag " + dateStr + " wirklich gelöscht werden?",
-                "Löschen bestätigen", JOptionPane.YES_NO_OPTION);
+                "Are you sure you want to delete " + dateStr + "?",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             dailyTimes.remove(date);
             updateTable();
@@ -427,8 +423,8 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Aktualisiert die Tabelle mit den täglich investierten Zeiten.
-     * Das Datum wird im Format "dd.MM.yyyy" und die Zeit gemäß der Einstellung (hh:mm oder hh:mm:ss) angezeigt.
+     * Updates the table with daily tracked times.
+     * Dates are shown in "dd.MM.yyyy" and times according to the setting.
      */
     private void updateTable() {
         tableModel.setRowCount(0);
@@ -440,18 +436,18 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Aktualisiert das Label für die Gesamtdauer.
+     * Updates the label showing the total tracked time.
      */
     private void updateTotalLabel() {
         long total = 0;
         for (Long time : dailyTimes.values()) {
             total += time;
         }
-        totalLabel.setText("Gesamte Zeit: " + formatTime(total));
+        totalLabel.setText("Total time: " + formatTime(total));
     }
 
     /**
-     * Speichert die täglich investierten Zeiten in einer Datei.
+     * Saves the daily tracked times to a file.
      */
     private void saveData() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
@@ -465,7 +461,7 @@ public class TimeTracker extends JFrame implements ActionListener {
     }
 
     /**
-     * Lädt die täglich investierten Zeiten aus einer Datei.
+     * Loads the daily tracked times from a file.
      */
     private void loadData() {
         File file = new File(DATA_FILE);
@@ -489,14 +485,16 @@ public class TimeTracker extends JFrame implements ActionListener {
 
     public static void main(String[] args) {
         try {
-            // Setze Nimbus Look and Feel, falls verfügbar (für ein konsistentes Erscheinungsbild)
+            // Set Nimbus Look and Feel, if available (for consistent appearance)
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // Ignore and use default
+        }
         SwingUtilities.invokeLater(() -> new TimeTracker());
     }
 }
