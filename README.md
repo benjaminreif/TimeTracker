@@ -39,13 +39,14 @@ java TimeTracker
 
 ## 📂 File Structure
 
+```bash
 /TimeTracker
 ├── src/
 │ └── TimeTracker.java # Main application source code
 ├── timetracker_data.txt # Generated automatically to save daily time
 ├── README.md # Project documentation
 └── LICENSE # License file (MIT by default)
-
+```
 ## 🙋‍♂️ Credits
 
 This project was created with the help of online resources and guidance from ChatGPT, as part of my learning journey in Java.
