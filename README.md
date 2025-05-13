@@ -35,6 +35,7 @@ Alternatively, compile and run from terminal:
 ```bash
 javac TimeTracker.java
 java TimeTracker
+```
 
 ## 📂 File Structure
 
